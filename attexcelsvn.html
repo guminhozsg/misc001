@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>File Attachment</title>
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <!-- Attach File label -->
+      <label for="attachment">Attach File:</label>
+      <!-- File Input -->
+      <input type="file" id="attachment" class="form-control-file" />
+      <!-- Export to Excel button -->
+      <button
+        type="button"
+        class="btn btn-primary mt-3"
+        onclick="exportToExcel()"
+      >
+        Export to Excel
+      </button>
+    </div>
+
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <!-- SheetJS JS -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+    <!-- Your custom JS code -->
+    <script>
+      function exportToExcel() {
+        // Get the file input field
+        var fileInput = document.getElementById("attachment");
+
+        // Check if a file is selected
+        if (fileInput.files.length > 0) {
+          // Get the selected file
+          var file = fileInput.files[0];
+
+          // Create a new FileReader object
+          var reader = new FileReader();
+
+          // Set the onload function
+          reader.onload = function (event) {
+            // Get the file content as a string
+            var fileContent = event.target.result;
+
+            // Parse the file content as a CSV file
+            var csvData = Papa.parse(fileContent).data;
+
+            // Convert the CSV data to an array of arrays
+            var sheetData = XLSX.utils.sheet_to_json(
+              XLSX.utils.aoa_to_sheet(csvData)
+            );
+
+            // Create a new workbook object
+            var wb = XLSX.utils.book_new();
+
+            // Add the sheet to the workbook
+            XLSX.utils.book_append_sheet(
+              wb,
+              XLSX.utils.json_to_sheet(sheetData),
+              "Sheet1"
+            );
+
+            // Generate a download link for the Excel file
+            var blob = new Blob([XLSX.write(wb, { type: "binary" })], {
+              type: "application/octet-stream",
+            });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement("a");
+            a.href = url;
+            a.download = "output.xlsx";
+
+            // Trigger the download dialog
+            document.body.appendChild(a);
+            a.click();
+
+            // Clean up
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          };
+
+          // Read the selected file as text
+          reader.readAsText(file);
+        } else {
+          alert("Please select a file.");
+        }
+      }
+    </script>
+  </body>
+</html>

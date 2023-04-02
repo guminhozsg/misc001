@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Display File Contents in Table</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Display File Contents in Table</h1>
+      <input type="file" id="attachment" class="form-control" />
+      <button type="button" class="btn btn-primary mt-3" onclick="readFile()">
+        Read File
+      </button>
+      <table class="table mt-3">
+        <thead>
+          <tr>
+            <th>Line Number</th>
+            <th>Text</th>
+          </tr>
+        </thead>
+        <tbody id="fileContents"></tbody>
+      </table>
+    </div>
+    <script>
+      function readFile() {
+        // Get the file input field
+        var fileInput = document.getElementById("attachment");
+
+        // Check if a file is selected
+        if (fileInput.files.length > 0) {
+          // Get the selected file
+          var file = fileInput.files[0];
+
+          // Create a new FileReader object
+          var reader = new FileReader();
+
+          // Set the onload function
+          reader.onload = function (event) {
+            // Get the file content as a string
+            var fileContent = event.target.result;
+
+            // Split the file content into an array of lines
+            var lines = fileContent.split("\n");
+
+            // Get the table body element
+            var tbody = document.getElementById("fileContents");
+
+            // Clear the table body
+            tbody.innerHTML = "";
+
+            // Loop through the lines and add them to the table
+            for (var i = 0; i < lines.length; i++) {
+              var line = lines[i].trim();
+              if (line) {
+                var row = document.createElement("tr");
+                var lineNumberCell = document.createElement("td");
+                lineNumberCell.textContent = i + 1;
+                var textCell = document.createElement("td");
+                textCell.textContent = line;
+                row.appendChild(lineNumberCell);
+                row.appendChild(textCell);
+                tbody.appendChild(row);
+              }
+            }
+          };
+
+          // Read the selected file as text
+          reader.readAsText(file);
+        } else {
+          alert("Please select a file.");
+        }
+      }
+    </script>
+  </body>
+</html>
